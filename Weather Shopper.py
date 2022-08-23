@@ -11,15 +11,11 @@ Detailed steps
 * Confirm the cart item is filled with price. '''
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import time
-import configparser
+import Conf_File.Locators_File as locators
 
-#launch the webdriver from selenium
-serv_obj = Service("C:\Drivers\chromedriver\chromedriver.exe")
-
-driver = webdriver.Chrome(service = serv_obj)
+driver = webdriver.Chrome()
 
 #get the url which it will navigate
 driver.get("https://weathershopper.pythonanywhere.com/")
@@ -27,27 +23,32 @@ driver.get("https://weathershopper.pythonanywhere.com/")
 #maximize the window
 driver.maximize_window()
 
-file = open("config.ini","r")
-config_Weather_Shopper = configparser.ConfigParser()
-config_Weather_Shopper.read("Config.ini")
+#Assigning all the locators in Locators_File
+Temperature_text = locators.Temperature_text
+Buy_moisturizers = locators.Buy_moisturizers
+Price_of_items = locators.Price_of_items
+Buy_sunscreens = locators.Buy_sunscreens
+Least_Priced = locators.Least_Priced
+Add_cart = locators.Add_cart
+Make_payment = locators.Make_payment
 
-
-def check_temperature():
-
+def get_temperature():
     #Check the temperature .
-    temperature_txt = driver.find_element(By.XPATH,"//span[@id='temperature']")
-    print("The temperature is:", temperature_txt.text)
+    temperature_txt = driver.find_element(By.XPATH,Temperature_text)
+    temperature = int((temperature_txt.text)[0:2])
+    print("The temperature is:", temperature, "°C")
 
+get_temperature()
 
-def compare_temperature(temperature_txt):
+def get_minimum_price(temperature_txt):
 
     product_price = []
     Least_items = 500
 
     if temperature_txt.text <= 23:
         time.sleep(2)
-        driver.find_element(By.XPATH,"//button[contains(text(),'Buy moisturizers')]").click()
-        products = driver.find_element((By.XPATH,"//p[contains(text(),'Price')]"))
+        driver.find_element(By.XPATH,Buy_moisturizers).click()
+        products = driver.find_element((By.XPATH,Price_of_items))
 
 
     #Select the minimum product price
@@ -55,19 +56,21 @@ def compare_temperature(temperature_txt):
             print(item)
             item = int((item.text)[-3::])
             product_price.append(item)
-        print(product_price)
+        print("product price of all the items:", product_price)
+        print(Least_items)
         Minimum_price = min(product_price)
-        print(Minimum_price)
+        print("The minimum price is:", Minimum_price)
 
 
-        Least_items = driver.find_element(By.XPATH,"//p[contains(text(),'product_price')]/following-sibling::button[@class='btn btn-primary']").click()
+        Least_items = driver.find_element(By.XPATH,Least_Priced).click()
         return products, product_price, Least_items
 
-    #Click on suncreen option
+
+    #Click on sunscreen option
     elif temperature_txt.text >= 30:
         time.sleep(2)
-        driver.find_element(By.XPATH,"//button[contains(text(),'Buy sunscreens')]").click()
-        products = driver.find_element((By.XPATH,"//p[contains(text(),'Price')]"))
+        driver.find_element(By.XPATH,Buy_sunscreens).click()
+        products = driver.find_element((By.XPATH , Price_of_items))
 
 
         for item in product_price:
@@ -75,33 +78,26 @@ def compare_temperature(temperature_txt):
             item = int((item.text)[-3::])
             product_price.append(item)
         print(product_price)
+        print(Least_items)
         Minimum_price = min(product_price)
         print(Minimum_price)
 
-        Least_items = driver.find_element(By.XPATH, "//p[contains(starts-with(),'product_price')]/following-sibling::button[@class='btn btn-primary']").click()
+        Least_items = driver.find_element(By.XPATH, Least_Priced).click()
         return products, product_price, Least_items
 
-def Adding_the_product():
-    #Adding the product in the cart by clicling the cart button
+get_minimum_price()
 
-    Adding_the_product = driver.find_element(By.XPATH, "//button[@class='thin-text nav-link']").click()
-    return Adding_the_product
+#Adding the product in the cart by clicking the cart button
+
+Adding_the_product = driver.find_element(By.XPATH, Add_cart).click()
 
 time.sleep(2)
 
-def Payment_of_the_product():
-    #Pays for the product by clicking the pay button
-    #normalize space() = The element has spaces in its text or in the value of any attribute.
+#Pays for the product by clicking the pay button
 
-    Payment=driver.find_element(By.XPATH,"//span[normalize-space()='Pay with Card']").click()
-    return Payment
+Payment=driver.find_element(By.XPATH,Make_payment).click()
 
 time.sleep(3)
-
-if __name__=="__main__":
-    temperature_txt = check_temperature()
-    The_least_priced = compare_temperature(temperature_txt)
-
 
 # Close the browser
 driver.close()
