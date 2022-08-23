@@ -23,30 +23,32 @@ driver = webdriver.Chrome(service = serv_obj)
 
 #get the url which it will navigate
 driver.get("https://weathershopper.pythonanywhere.com/")
+
+#maximize the window
 driver.maximize_window()
+
+file = open("config.ini","r")
+config_Weather_Shopper = configparser.ConfigParser()
+config_Weather_Shopper.read("Config.ini")
+
 
 def check_temperature():
 
-    #Locate the temperature button and perform click action.
+    #Check the temperature .
     temperature_txt = driver.find_element(By.XPATH,"//span[@id='temperature']")
-    print(temperature_txt.text)
+    print("The temperature is:", temperature_txt.text)
+
 
 def compare_temperature(temperature_txt):
-    config_Weather_Shopper = configparser.ConfigParser()
-    config_Weather_Shopper.read("Config.ini")
-    #Click on moisturizer option
-    x = config_Weather_Shopper["Temperature_Below_23°C"]
-    buy_moisturizers = int(x["buy_moisturizers"])
 
-    y = config_Weather_Shopper["Temperature_Above_30°C"]
-    buy_sunscreens = int(y["buy_sunscreens"])
+    product_price = []
+    Least_items = 500
 
-    if temperature_txt.text == buy_moisturizers:
+    if temperature_txt.text <= 23:
         time.sleep(2)
         driver.find_element(By.XPATH,"//button[contains(text(),'Buy moisturizers')]").click()
         products = driver.find_element((By.XPATH,"//p[contains(text(),'Price')]"))
-        product_price = []
-        Least_items = 500
+
 
     #Select the minimum product price
         for item in product_price:
@@ -62,12 +64,11 @@ def compare_temperature(temperature_txt):
         return products, product_price, Least_items
 
     #Click on suncreen option
-    elif temperature_txt.text == buy_sunscreens:
+    elif temperature_txt.text >= 30:
         time.sleep(2)
         driver.find_element(By.XPATH,"//button[contains(text(),'Buy sunscreens')]").click()
         products = driver.find_element((By.XPATH,"//p[contains(text(),'Price')]"))
-        product_price = []
-        Least_items = 500
+
 
         for item in product_price:
             print(item)

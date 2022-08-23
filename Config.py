@@ -2,13 +2,21 @@ import configparser
 
 subject_file = configparser.ConfigParser()
 
-subject_file.add_section("Temperature_Below_23°C")
-subject_file.set("Temperature_Below_23°C", "Buy_moisturizers", "23°C")
+subject_file.add_section("Xpath_main_text")
+subject_file.set("Xpath_main_set", "Check temperature", "//span[@id='temperature']")
+subject_file.set("Xpath_main_set", "Buy moisturizers", "//button[contains(text(),'Buy moisturizers')]")
+subject_file.set("Xpath_main_set", "Buy sunscreens", "//button[contains(text(),'Buy sunscreens')]")
 
 
-subject_file.add_section("Temperature_Above_23°C")
-subject_file.set("Temperature_Above_23°C", "Buy_sunscreens", "30°C")
+subject_file["Product Samples"] = {"For moisturizers samples":
+                 "//p[contains(text(),'Price')]",
+                "For sunscreens samples":
+                "//p[contains(text(),'Price')]"}
 
+subject_file["Least_Price"] = {"Least price for sunscreens":
+                            "//p[contains(text(),'product_price')]/following-sibling::button[@class='btn btn-primary']",
+                             "Least price for moisturizers" :
+                             "//p[contains(text(),'product_price')]/following-sibling::button[@class='btn btn-primary']"}
 
 with open(r"Config.ini", 'w') as configfile:
     subject_file.write(configfile)
