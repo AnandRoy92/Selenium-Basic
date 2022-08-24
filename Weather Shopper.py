@@ -32,58 +32,37 @@ Least_Priced = locators.Least_Priced
 Add_cart = locators.Add_cart
 Make_payment = locators.Make_payment
 
-def get_temperature():
-    #Check the temperature .
-    temperature_txt = driver.find_element(By.XPATH,Temperature_text)
-    temperature = int((temperature_txt.text)[0:2])
-    print("The temperature is:", temperature, "°C")
 
-get_temperature()
+#Check the temperature .
+temperature_text = driver.find_element(By.XPATH,Temperature_text)
+temperature = int((temperature_text.text)[0:2])
+print("The temperature is:", temperature, "°C")
 
-def get_minimum_price(temperature_txt):
+def get_minimum_price():
 
     product_price = []
     Least_items = 500
 
-    if temperature_txt.text <= 23:
-        time.sleep(2)
-        driver.find_element(By.XPATH,Buy_moisturizers).click()
-        products = driver.find_element((By.XPATH,Price_of_items))
-
-
     #Select the minimum product price
-        for item in product_price:
-            print(item)
-            item = int((item.text)[-3::])
-            product_price.append(item)
-        print("product price of all the items:", product_price)
-        print(Least_items)
-        Minimum_price = min(product_price)
-        print("The minimum price is:", Minimum_price)
+    for item in products:
+        print(item)
+        item = int((item.text)[-3::])
+        product_price.append(item)
+    print("product price of all the items:", product_price)
+    Minimum_price = int(min(product_price))
+    print("The minimum price is:", Minimum_price)
+    Least_items = driver.find_element(By.XPATH, Least_Priced%Minimum_price).click()
 
+if  temperature <= 23:
+    time.sleep(2)
+    driver.find_element(By.XPATH, Buy_moisturizers).click()
+    products = driver.find_elements((By.XPATH, Price_of_items))
 
-        Least_items = driver.find_element(By.XPATH,Least_Priced).click()
-        return products, product_price, Least_items
-
-
-    #Click on sunscreen option
-    elif temperature_txt.text >= 30:
-        time.sleep(2)
-        driver.find_element(By.XPATH,Buy_sunscreens).click()
-        products = driver.find_element((By.XPATH , Price_of_items))
-
-
-        for item in product_price:
-            print(item)
-            item = int((item.text)[-3::])
-            product_price.append(item)
-        print(product_price)
-        print(Least_items)
-        Minimum_price = min(product_price)
-        print(Minimum_price)
-
-        Least_items = driver.find_element(By.XPATH, Least_Priced).click()
-        return products, product_price, Least_items
+#Click on sunscreen option
+elif temperature >= 24:
+    time.sleep(2)
+    driver.find_element(By.XPATH,Buy_sunscreens).click()
+    products = driver.find_element((By.XPATH , Price_of_items))
 
 get_minimum_price()
 
@@ -101,4 +80,3 @@ time.sleep(3)
 
 # Close the browser
 driver.close()
-
